@@ -1,0 +1,116 @@
+https://www.youtube.com/watch?v=fwGdmU2wi9s
+https://electronics-project-hub.com/send-data-to-thingspeak-using-esp8266/
+https://how2electronics.com/iot-air-pollution-monitoring-esp8266/
+
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+
+#define SEALEVELPRESSURE_HPA (1013.25)
+
+Adafruit_BME280 bme;
+
+void setup() {
+  Serial.begin(9600);
+
+  if (!bme.begin(0x76)) {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    while (1);
+  }
+}
+
+void loop() {
+  Serial.print("Temperature = ");
+  Serial.print(bme.readTemperature());
+  Serial.println("*C");
+
+  Serial.print("Pressure = ");
+  Serial.print(bme.readPressure() / 100.0F);
+  Serial.println("hPa");
+
+  Serial.print("Approx. Altitude = ");
+  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+  Serial.println("m");
+
+  Serial.print("Humidity = ");
+  Serial.print(bme.readHumidity());
+  Serial.println("%");
+
+  Serial.println();
+  delay(1000);
+}
+
+
+// ----------(c) Electronics-project-hub-------- //
+#include "ThingSpeak.h"
+#include <ESP8266WiFi.h>
+
+//------- WI-FI details ----------//
+char ssid[] = "xxxxxxxxx"; //SSID here
+char pass[] = "yyyyyyyyy"; // Passowrd here
+//--------------------------------//
+
+//----------- Channel details ----------------//
+unsigned long Channel_ID = 12345; // Your Channel ID
+const char * myWriteAPIKey = "ABCDEF12345"; //Your write API key
+//-------------------------------------------//
+
+const int Field_Number_1 = 1;
+const int Field_Number_2 = 2;
+String value = "";
+int value_1 = 0, value_2 = 0;
+int x, y;
+WiFiClient  client;
+
+void setup()
+{
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  ThingSpeak.begin(client);
+  internet();
+}
+
+void loop()
+{
+  internet();
+  if (Serial.available() > 0)
+  {
+    delay(100);
+    while (Serial.available() > 0)
+    {
+      value = Serial.readString();
+      if (value[0] == '*')
+      {
+        if (value[5] == '#')
+        {
+          value_1 = ((value[1] - 0x30) * 10 + (value[2] - 0x30));
+          value_2 = ((value[3] - 0x30) * 10 + (value[4] - 0x30));
+        }
+      }
+    }
+  }
+  upload();
+}
+
+void internet()
+{
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      WiFi.begin(ssid, pass);
+      delay(5000);
+    }
+  }
+}
+
+void upload()
+{
+  ThingSpeak.writeField(Channel_ID, Field_Number_1, value_1, myWriteAPIKey);
+  delay(15000);
+  ThingSpeak.writeField(Channel_ID, Field_Number_2, value_2, myWriteAPIKey);
+  delay(15000);
+  value = "";
+
+}
+// ----------(c) Electronics-project-hub-------- //

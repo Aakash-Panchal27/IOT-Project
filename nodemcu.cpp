@@ -38,12 +38,18 @@ void loop() {
 
   float humidity = data["humidity"];
   float temperature = data["temperature"];
+  float pressure = data["pressure"];
+  float altitude = data["altitude"];
   float air_quality = data["air_quality"];
   ThingSpeak.writeField(Channel_ID, 1, humidity, myWriteAPIKey);
   delay(15000);
   ThingSpeak.writeField(Channel_ID, 2, temperature, myWriteAPIKey);
   delay(15000);
-  ThingSpeak.writeField(Channel_ID, 3, air_quality, myWriteAPIKey);
+  ThingSpeak.writeField(Channel_ID, 3, pressure, myWriteAPIKey);
+  delay(15000);
+  ThingSpeak.writeField(Channel_ID, 4, altitude, myWriteAPIKey);
+  delay(15000);
+  ThingSpeak.writeField(Channel_ID, 5, air_quality, myWriteAPIKey);
   delay(15000);
 }
 
