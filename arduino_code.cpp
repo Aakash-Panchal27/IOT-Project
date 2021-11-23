@@ -1,7 +1,5 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-#include <ArduinoJson.h>
-#include <SoftwareSerial.h>
 #include "MQ135.h"
 
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -33,5 +31,5 @@ void loop() {
       String(pressure) + String('+') + String(altitude) + String('+') + String(air_quality);
 
   Serial.println(data);
-  delay(2000);
+  delay(80000);
 }
