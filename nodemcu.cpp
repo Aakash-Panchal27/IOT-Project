@@ -1,17 +1,15 @@
-//Include Lib for Arduino to Nodemcu
 #include <SoftwareSerial.h>
-#include <ArduinoJson.h>
 #include "ThingSpeak.h"
 #include <ESP8266WiFi.h>
 
-// D1 = Rx & D2 = Tx
-SoftwareSerial nodemcu(D1, D2);
+// D6 = Rx & D5 = Tx
+SoftwareSerial nodemcu(D6, D5);
 
 // Wifi settings
 char ssid[] = "Kamlesh Panchal"; // SSID
 char pass[] = "Jayambe19"; // Passowrd
-unsigned long Channel_ID = 0; // Your Channel ID
-const char * myWriteAPIKey = ""; //Your write API key
+unsigned long Channel_ID = 1580319; // Your Channel ID
+const char * myWriteAPIKey = "0476RK7UA3KRIY2S"; //Your write API key
 
 WiFiClient client;
 
@@ -24,33 +22,59 @@ void setup() {
   connect_to_internet();
 }
 
+String str;
+
 void loop() {
-  StaticJsonBuffer<1000> jsonBuffer;
-  JsonObject& data = jsonBuffer.parseObject(nodemcu);
+  if (nodemcu.available()) {
+    str = nodemcu.readString();
 
-  if (data == JsonObject::invalid()) {
-    //Serial.println("Invalid Json Object");
-    jsonBuffer.clear();
-    return;
+    int start = 0, end = 0;
+    end = str.indexOf('+', start);
+    float humidity = str.substring(start, end).toFloat();
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.println("%");
+
+    start = end + 1;
+    end = str.indexOf('+', start);
+    float temperature = str.substring(start, end).toFloat();
+    Serial.print("Temperature: ");
+    Serial.print(temperature);
+    Serial.println("*C");
+
+    start = end + 1;
+    end = str.indexOf('+', start);
+    float pressure = str.substring(start, end).toFloat();
+    Serial.print("Pressure: ");
+    Serial.print(pressure);
+    Serial.println("hPa");
+
+    start = end + 1;
+    end = str.indexOf('+', start);
+    float altitude = str.substring(start, end).toFloat();
+    Serial.print("Altitude: ");
+    Serial.print(altitude);
+    Serial.println("m");
+
+    start = end + 1;
+    float air_quality = str.substring(start).toFloat();
+    Serial.print("Air Quality: ");
+    Serial.print(air_quality);
+    Serial.println("ppm");
+
+    Serial.println("--------------------------------------");
+
+    ThingSpeak.writeField(Channel_ID, 1, humidity, myWriteAPIKey);
+    delay(15000);
+    ThingSpeak.writeField(Channel_ID, 2, temperature, myWriteAPIKey);
+    delay(15000);
+    ThingSpeak.writeField(Channel_ID, 3, pressure, myWriteAPIKey);
+    delay(15000);
+    ThingSpeak.writeField(Channel_ID, 4, altitude, myWriteAPIKey);
+    delay(15000);
+    ThingSpeak.writeField(Channel_ID, 5, air_quality, myWriteAPIKey);
+    delay(15000);
   }
-
-  Serial.println("JSON Object Recieved");
-
-  float humidity = data["humidity"];
-  float temperature = data["temperature"];
-  float pressure = data["pressure"];
-  float altitude = data["altitude"];
-  float air_quality = data["air_quality"];
-  ThingSpeak.writeField(Channel_ID, 1, humidity, myWriteAPIKey);
-  delay(15000);
-  ThingSpeak.writeField(Channel_ID, 2, temperature, myWriteAPIKey);
-  delay(15000);
-  ThingSpeak.writeField(Channel_ID, 3, pressure, myWriteAPIKey);
-  delay(15000);
-  ThingSpeak.writeField(Channel_ID, 4, altitude, myWriteAPIKey);
-  delay(15000);
-  ThingSpeak.writeField(Channel_ID, 5, air_quality, myWriteAPIKey);
-  delay(15000);
 }
 
 void connect_to_internet()
