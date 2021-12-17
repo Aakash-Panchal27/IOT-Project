@@ -1,3 +1,12 @@
+/*
+This is the code for Arduino.
+
+Basic code flow is as below:
+
+Arduino basically reads different parameter data from sensors and 
+sends the concatenated string of all parameter values to ESP8266 Nodemcu WiFi module.
+*/
+
 #include <Adafruit_BME280.h>
 
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -12,6 +21,7 @@ void setup() {
     Serial.println("Could not find a valid BME280 sensor, check wiring!");
     delay(5000);
   }
+  Serial.flush();
   delay(1000);
 }
 
@@ -23,11 +33,15 @@ void loop() {
   float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA); // in meters
 
   // MQ135 (Air quality) sensor data
-  float air_quality = analogRead(A0);
+  float air_quality = analogRead(A0); // in PPM
 
+  // Concatenated string consisting of all five data
+  // Note that here '+' character added just to seperate different sensor data
+  // Thish '+' character will be used in the Nodemcu code to parse the data and get all parameter values seperately.
   data = String(humidity) + String('+') + String(temperature) + String('+') +
       String(pressure) + String('+') + String(altitude) + String('+') + String(air_quality);
 
+  // This will transmit 'data' string from the Tx pin (pin no: 1) of Arduino.
   Serial.println(data);
   delay(80000);
 }
