@@ -8,7 +8,7 @@ We are measuing five parameters:
 
 This is the code for Arduino.
 
-Basic code flow is as below:
+Basic working of code is as below:
 
 Arduino reads different parameter data using sensors (MQ135 and BME280) and
 sends the concatenated string of all parameter values to ESP8266 Nodemcu WiFi module.
