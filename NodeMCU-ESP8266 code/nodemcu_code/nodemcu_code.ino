@@ -1,7 +1,7 @@
 /*
 This is the code for WiFi module ESP8266 NodeMCU.
 
-Basic code flow is as below:
+Basic working of code is as below:
 
 First of all, Nodemcu ESP8266 WiFi module receives the data from Arduino's Tx pin (Check circuit from PPT),
 and one single string is received at Nodemcu. Now, this string is parsed using built-in String
