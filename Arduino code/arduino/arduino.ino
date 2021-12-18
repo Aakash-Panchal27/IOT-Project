@@ -1,9 +1,16 @@
 /*
+We are measuing five parameters:
+1. Temperature
+2. Humidity
+3. Pressure
+4. Altitude
+5. Air Quality
+
 This is the code for Arduino.
 
 Basic code flow is as below:
 
-Arduino basically reads different parameter data from sensors and 
+Arduino reads different parameter data using sensors (MQ135 and BME280) and
 sends the concatenated string of all parameter values to ESP8266 Nodemcu WiFi module.
 */
 
@@ -35,9 +42,9 @@ void loop() {
   // MQ135 (Air quality) sensor data
   float air_quality = analogRead(A0); // in PPM
 
-  // Concatenated string consisting of all five data
-  // Note that here '+' character added just to seperate different sensor data
-  // Thish '+' character will be used in the Nodemcu code to parse the data and get all parameter values seperately.
+  // Creating concatenated string consisting of all five parameter values.
+  // Note that here '+' character added just to seperate different parameter values
+  // This '+' character will be used in the Nodemcu code to parse the data and get all parameter values seperately.
   data = String(humidity) + String('+') + String(temperature) + String('+') +
       String(pressure) + String('+') + String(altitude) + String('+') + String(air_quality);
 
