@@ -3,18 +3,17 @@ This is the code for WiFi module ESP8266 NodeMCU.
 
 Basic code flow is as below:
 
-First of all, Nodemcu ESP8266 WiFi module receives the data from Arduino's Tx pin,
-and one single string is received. Now, this string is parsed using built-in String 
-class function and '+' character that we have added while concatenating the parameter values.
+First of all, Nodemcu ESP8266 WiFi module receives the data from Arduino's Tx pin (Check circuit from PPT),
+and one single string is received at Nodemcu. Now, this string is parsed using built-in String
+class functions and '+' character that we have added while concatenating the parameter values.
 
 Finally, after parsing all parameter values, we can send it to the thingspeak.com cloud using
 'writeField' function by providing required parameters: Field Id, Channel Id, write API key and
 parameter value.
 
-Note that we already created a channel in ThingSpeak.com cloud, and we did set up as per our
+Note that we already created a channel in ThingSpeak.com cloud, and we did a set up as per our
 project requirements.
 */
-
 
 #include <SoftwareSerial.h>
 #include "ThingSpeak.h"
@@ -22,11 +21,12 @@ project requirements.
 
 // D6 = Rx & D5 = Tx
 // That transmitted data from Tx pin of Arduino will be received in D6 pin of Nodemcu WiFi module.
+// Note: We can select any available pins as Tx and Rx pins on Nodemcu.
 SoftwareSerial nodemcu(D6, D5);
 
 // Wifi settings
 char ssid[] = "Kamlesh Panchal"; // SSID
-char pass[] = "Jayambe19"; // Passowrd
+char pass[] = "Jayambe19"; // Password
 unsigned long Channel_ID = 1580319; // Channel ID
 const char * myWriteAPIKey = "0476RK7UA3KRIY2S"; // Write API key
 
@@ -35,6 +35,8 @@ WiFiClient client;
 void setup() {
   // Initialize Serial port
   Serial.begin(9600);
+  
+  // Initialize 'nodemcu' SoftwareSerial object, which is a data stream.
   nodemcu.begin(9600);
 
   // Set general wifi mode in usage: WIFI_STA.
@@ -57,7 +59,7 @@ void loop() {
     if((str[0] >= '0' and str[0] <= '9')) {
       
       // Parsing parameters one by one.
-      // Using functions provided by String built-in class in Arduino IDE, to parse data using '+' character
+      // Using functions provided by built-in String class in Arduino IDE, to parse data using '+' character
       // that have been used while creating a single string of all parameter values at Arduino.
       int start = 0, end = 0;
       end = str.indexOf('+', start);
@@ -95,7 +97,7 @@ void loop() {
   
       Serial.println("--------------------------------------");
   
-      // Use functions provided by ThingSpeak.h library to write data to the channel on thingspeak.com cloud.
+      // Using `writeField` function provided by ThingSpeak.h library to write data to the channel on thingspeak.com cloud.
       ThingSpeak.writeField(Channel_ID, 1, humidity, myWriteAPIKey);
 
       // Here 15 seconds (15000 ms) is taken because single write update time for a channel in thingspeak.com is 15 seconds.
